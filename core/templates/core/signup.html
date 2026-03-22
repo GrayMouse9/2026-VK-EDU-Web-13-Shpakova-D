@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10 col-lg-8">
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <h3 class="card-title text-center mb-4">Registration</h3>
+
+                <form method="POST" action="{% url 'signup' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="regLogin" class="form-label fw-bold">Login</label>
+                        <input type="text" class="form-control" id="regLogin" placeholder="Enter your login">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label fw-bold">Email</label>
+                        <input type="email" class="form-control is-invalid" id="regEmail" placeholder="name@example.com"
+                            value="test@test.com">
+                        <div class="invalid-feedback">
+                            This email is already registered.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regNickName" class="form-label fw-bold">Nickname</label>
+                        <input type="text" class="form-control" id="regNickName" placeholder="Enter your nickname">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPassword1" class="form-label fw-bold">Password</label>
+                        <input type="password" class="form-control" id="regPassword1" placeholder="Enter your password">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="regPassword2" class="form-label fw-bold">Repeat password</label>
+                        <input type="password" class="form-control" id="regPassword2" placeholder="Repeat your password">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="regAvatar" class="form-label fw-bold">Upload avatar</label>
+                        <input class="form-control" type="file" id="regAvatar">
+                        <div class="form-text">Supported formats: JPG, PNG. Max size: 2MB.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Register!</button>
+
+                    <div class="text-center">
+                        <span class="text-muted">Already have an account?</span>
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Log in</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
