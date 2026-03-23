@@ -6,38 +6,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вопросы и ответы</title>
-    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
-    <link rel="icon" href="{% static 'core/img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-   <nav class="navbar navbar-expand-lg bg-light border-bottom mb-4 py-2">
-        <div class="container flex-wrap align-items-center">
+    <nav class="navbar navbar-expand-lg bg-light border-bottom mb-4 py-2">
+        <div class="container align-items-center justify-content-between">
 
-            <a class="navbar-brand fw-bold m-0 pe-2" href="{% url 'index' %}">AskPupkin</a>
+            <a class="navbar-brand fw-bold m-0" href="{% url 'index' %}">AskPupkin</a>
 
-            <form class="d-flex flex-grow-1 mx-2 mx-lg-auto order-2 order-lg-1" style="max-width: 500px;" role="search" action="#" method="GET">
-                <input class="form-control me-2" type="search" placeholder="Search..." aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-
-            <button class="navbar-toggler order-3" type="button" data-bs-toggle="collapse" data-bs-target="#userMenu" aria-controls="userMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userMenu"
+                aria-controls="userMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse order-4 order-lg-2 flex-grow-0" id="userMenu">
-                <div class="d-flex align-items-center mt-3 mt-lg-0">
+            <div class="collapse navbar-collapse" id="userMenu">
+
+                <form class="d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0 navbar-search" role="search" action="#"
+                    method="GET">
+                    <input class="form-control me-2" type="search" placeholder="Search..." aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+
+                <div class="d-flex align-items-center ms-lg-auto">
 
                     <a href="{% url 'ask' %}" class="btn btn-primary me-4">Ask!</a>
 
                     {% if True %}
                     <div class="user-info d-flex align-items-center">
-                        <img src="{% static 'core/img/avatar.png' %}" width="40" height="40" class="me-3 rounded-circle" alt="Avatar">
-                        <div class="d-flex flex-column justify-content-center">
-                            <div class="fw-bold lh-1 mb-1" style="font-size: 0.95rem;">Dr. Pepper</div>
+                        <img src="{% static 'img/avatar.png' %}" width="40" height="40" class="me-3 rounded-circle"
+                            alt="Avatar">
+                        <div class="d-flex flex-column justify-content-center text-start">
+                            <div class="fw-bold lh-1 mb-1 fs-6">Dr. Pepper</div>
                             <div class="lh-1">
-                                <a href="{% url 'profile' %}" style="font-size: 0.8rem;" class="me-2 text-decoration-none">Settings</a>
-                                <a href="{% url 'login' %}" style="font-size: 0.8rem;" class="text-decoration-none">Log out</a>
+                                <a href="{% url 'profile' %}" class="me-2 text-decoration-none small">Settings</a>
+                                <a href="{% url 'login' %}" class="text-decoration-none small">Log out</a>
                             </div>
                         </div>
                     </div>
@@ -103,10 +108,10 @@
     </div>
     </div>
     <footer class="mt-auto py-4 bg-light border-top text-center text-muted small">
-            &copy; 2024 AskPupkin. All rights reserved.
+        &copy; 2026 AskPupkin. All rights reserved.
     </footer>
 
-    <script src="{% static 'core/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 
 </html>
