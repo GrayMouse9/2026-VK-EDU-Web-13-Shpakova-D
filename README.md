@@ -37,7 +37,7 @@ AskPupkin — это платформа, где пользователи мог�
 Склонируйте репозиторий:
 ```bash
 git clone [https://github.com/GrayMouse9/2026-VK-EDU-Web-13-Shpakova-D.git](https://github.com/GrayMouse9/2026-VK-EDU-Web-13-Shpakova-D.git)
-cd web
+cd 2026-VK-EDU-Web-13-Shpakova-D
 ```
 
 ### Вариант 1. Локальный запуск:
