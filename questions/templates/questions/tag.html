@@ -4,188 +4,49 @@
 {% block content %}
 <div class="mb-3">
     <h2 class="d-inline-block me-2">Tag:</h2>
-    <span class="badge bg-secondary fs-4 align-middle">css</span>
+    <span class="badge bg-secondary fs-4 align-middle">{{ tag }}</span>
 </div>
 <hr>
 
+{% for question in page.object_list %}
 <div class="card mb-3 shadow-sm">
     <div class="row g-0">
-
         <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
             <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-
             <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
                 <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="5" readonly>
+                <input type="text" class="form-control text-center px-0 rating-input" value="{{ question.rating }}" readonly>
                 <button class="btn btn-outline-danger px-2" type="button">-</button>
             </div>
-
         </div>
 
         <div class="col-12 col-md-10">
             <div class="card-body pt-0 pt-md-3">
                 <h5 class="card-title">
-                    <a href="{% url 'question' question_id=1 %}" class="text-decoration-none">Как правильно отцентровать
-                        div?</a>
+                    <a href="{% url 'question' question_id=question.id %}" class="text-decoration-none">{{ question.title }}</a>
                 </h5>
                 <p class="card-text">
-                    Уже третий день пытаюсь выровнять блок по центру экрана. Пробовал использовать
-                    margin: 0 auto, но по вертикали он не выравнивается. Помогите разобраться с Flexbox!
+                    {{ question.text }}
                 </p>
 
                 <div class="d-flex justify-content-between align-items-end mt-3">
                     <div>
-                        <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 3</a>
+                        <a href="{% url 'question' question_id=question.id %}" class="text-decoration-none me-3">Answer: {{ question.answers_count }}</a>
                         <span class="text-muted me-1">Tags:</span>
-                        <a href="#" class="badge bg-secondary text-decoration-none">css</a>
-                        <a href="#" class="badge bg-secondary text-decoration-none">html</a>
+                        {% for t in question.tags %}
+                            <a href="#" class="badge bg-secondary text-decoration-none">{{ t }}</a>
+                        {% endfor %}
                     </div>
                     <div class="text-muted small">
-                        Dr. Pepper | 2 часа назад
+                        {{ question.author }} | 2 часа назад
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
+{% endfor %}
 
-<div class="card mb-3 shadow-sm">
-    <div class="row g-0">
+{% include 'inc/pagination.html' %}
 
-        <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-
-            <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
-                <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="5" readonly>
-                <button class="btn btn-outline-danger px-2" type="button">-</button>
-            </div>
-
-        </div>
-
-        <div class="col-12 col-md-10">
-            <div class="card-body pt-0 pt-md-3">
-                <h5 class="card-title">
-                    <a href="{% url 'question' question_id=1 %}" class="text-decoration-none">Как правильно отцентровать
-                        div?</a>
-                </h5>
-                <p class="card-text">
-                    Уже третий день пытаюсь выровнять блок по центру экрана. Пробовал использовать
-                    margin: 0 auto, но по вертикали он не выравнивается. Помогите разобраться с Flexbox!
-                </p>
-
-                <div class="d-flex justify-content-between align-items-end mt-3">
-                    <div>
-                        <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 3</a>
-                        <span class="text-muted me-1">Tags:</span>
-                        <a href="#" class="badge bg-secondary text-decoration-none">css</a>
-                        <a href="#" class="badge bg-secondary text-decoration-none">html</a>
-                    </div>
-                    <div class="text-muted small">
-                        Dr. Pepper | 2 часа назад
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<div class="card mb-3 shadow-sm">
-    <div class="row g-0">
-
-        <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-
-            <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
-                <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="5" readonly>
-                <button class="btn btn-outline-danger px-2" type="button">-</button>
-            </div>
-
-        </div>
-
-        <div class="col-12 col-md-10">
-            <div class="card-body pt-0 pt-md-3">
-                <h5 class="card-title">
-                    <a href="{% url 'question' question_id=1 %}" class="text-decoration-none">Как правильно отцентровать
-                        div?</a>
-                </h5>
-                <p class="card-text">
-                    Уже третий день пытаюсь выровнять блок по центру экрана. Пробовал использовать
-                    margin: 0 auto, но по вертикали он не выравнивается. Помогите разобраться с Flexbox!
-                </p>
-
-                <div class="d-flex justify-content-between align-items-end mt-3">
-                    <div>
-                        <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 3</a>
-                        <span class="text-muted me-1">Tags:</span>
-                        <a href="#" class="badge bg-secondary text-decoration-none">css</a>
-                        <a href="#" class="badge bg-secondary text-decoration-none">html</a>
-                    </div>
-                    <div class="text-muted small">
-                        Dr. Pepper | 2 часа назад
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<div class="card mb-3 shadow-sm">
-    <div class="row g-0">
-
-        <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-
-            <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
-                <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="5" readonly>
-                <button class="btn btn-outline-danger px-2" type="button">-</button>
-            </div>
-
-        </div>
-
-        <div class="col-12 col-md-10">
-            <div class="card-body pt-0 pt-md-3">
-                <h5 class="card-title">
-                    <a href="{% url 'question' question_id=1 %}" class="text-decoration-none">Как правильно отцентровать
-                        div?</a>
-                </h5>
-                <p class="card-text">
-                    Уже третий день пытаюсь выровнять блок по центру экрана. Пробовал использовать
-                    margin: 0 auto, но по вертикали он не выравнивается. Помогите разобраться с Flexbox!
-                </p>
-
-                <div class="d-flex justify-content-between align-items-end mt-3">
-                    <div>
-                        <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 3</a>
-                        <span class="text-muted me-1">Tags:</span>
-                        <a href="#" class="badge bg-secondary text-decoration-none">css</a>
-                        <a href="#" class="badge bg-secondary text-decoration-none">html</a>
-                    </div>
-                    <div class="text-muted small">
-                        Dr. Pepper | 2 часа назад
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-        </li>
-        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-    </ul>
-</nav>
 {% endblock %}
