@@ -8,6 +8,8 @@ services:
     volumes:
       - .:/app
       - media_data:/app/media
+    env_file:
+      - .env
 
 volumes:
   media_data:
