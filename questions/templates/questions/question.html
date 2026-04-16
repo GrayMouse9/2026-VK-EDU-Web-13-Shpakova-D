@@ -28,8 +28,9 @@
                     <div>
                         <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 2</a>
                         <span class="text-muted me-1">Tags:</span>
-                        <a href="#" class="badge bg-secondary text-decoration-none">css</a>
-                        <a href="#" class="badge bg-secondary text-decoration-none">html</a>
+                        {% for tag in question.tags %}
+                            <a href="{% url 'tag' tag %}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
+                        {% endfor %}
                     </div>
                     <div class="text-muted small">
                         Dr. Pepper | 2 hours ago
