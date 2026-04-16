@@ -68,29 +68,39 @@
 
             <aside class="col-lg-3">
 
+
                 <div class="mb-5">
                     <h4 class="mb-3">Popular Tags</h4>
                     <div class="d-flex flex-wrap align-items-baseline gap-2">
-                        <a href="#" class="text-decoration-none fs-4 text-danger fw-bold">python</a>
-                        <a href="#" class="text-decoration-none fs-6 text-dark">perl</a>
-                        <a href="#" class="text-decoration-none fs-5 text-success">django</a>
-                        <a href="#" class="text-decoration-none fs-3 text-primary fw-bold">MySQL</a>
-                        <a href="#" class="text-decoration-none fs-6 text-muted">TechnoPark</a>
-                        <a href="#" class="text-decoration-none fs-5 text-warning text-dark">Mail.Ru</a>
-                        <a href="#" class="text-decoration-none fs-6 text-secondary">Voloshin</a>
-                        <a href="#" class="text-decoration-none fs-5 text-info text-dark">Firefox</a>
-                        <a href="#" class="text-decoration-none fs-4 text-primary">css</a>
-                        <a href="#" class="text-decoration-none fs-6 text-danger">html</a>
-                        <a href="#" class="text-decoration-none fs-5 text-success">javascript</a>
-                        <a href="#" class="text-decoration-none fs-3 text-dark fw-bold">linux</a>
-                        <a href="#" class="text-decoration-none fs-6 text-muted">c++</a>
-                        <a href="#" class="text-decoration-none fs-5 text-secondary">docker</a>
-                        <a href="#" class="text-decoration-none fs-4 text-warning text-dark">react</a>
-                        <a href="#" class="text-decoration-none fs-6 text-info text-dark">git</a>
-                        <a href="#" class="text-decoration-none fs-5 text-primary">nginx</a>
-                        <a href="#" class="text-decoration-none fs-6 text-danger">ubuntu</a>
-                        <a href="#" class="text-decoration-none fs-4 text-success">postgresql</a>
-                        <a href="#" class="text-decoration-none fs-5 text-dark">bash</a>
+                        <a href="{% url 'tag' 'python' %}"
+                            class="text-decoration-none fs-4 text-danger fw-bold">python</a>
+                        <a href="{% url 'tag' 'perl' %}" class="text-decoration-none fs-6 text-dark">perl</a>
+                        <a href="{% url 'tag' 'django' %}" class="text-decoration-none fs-5 text-success">django</a>
+                        <a href="{% url 'tag' 'MySQL' %}"
+                            class="text-decoration-none fs-3 text-primary fw-bold">MySQL</a>
+                        <a href="{% url 'tag' 'TechnoPark' %}"
+                            class="text-decoration-none fs-6 text-muted">TechnoPark</a>
+                        <a href="{% url 'tag' 'Ru' %}"
+                            class="text-decoration-none fs-5 text-warning text-dark">Mail.Ru</a>
+                        <a href="{% url 'tag' 'Voloshin' %}"
+                            class="text-decoration-none fs-6 text-secondary">Voloshin</a>
+                        <a href="{% url 'tag' 'Firefox' %}"
+                            class="text-decoration-none fs-5 text-info text-dark">Firefox</a>
+                        <a href="{% url 'tag' 'css' %}" class="text-decoration-none fs-4 text-primary">css</a>
+                        <a href="{% url 'tag' 'html' %}" class="text-decoration-none fs-6 text-danger">html</a>
+                        <a href="{% url 'tag' 'javascript' %}"
+                            class="text-decoration-none fs-5 text-success">javascript</a>
+                        <a href="{% url 'tag' 'linux' %}" class="text-decoration-none fs-3 text-dark fw-bold">linux</a>
+                        <a href="{% url 'tag' 'c' %}" class="text-decoration-none fs-6 text-muted">c++</a>
+                        <a href="{% url 'tag' 'docker' %}" class="text-decoration-none fs-5 text-secondary">docker</a>
+                        <a href="{% url 'tag' 'react' %}"
+                            class="text-decoration-none fs-4 text-warning text-dark">react</a>
+                        <a href="{% url 'tag' 'git' %}" class="text-decoration-none fs-6 text-info text-dark">git</a>
+                        <a href="{% url 'tag' 'nginx' %}" class="text-decoration-none fs-5 text-primary">nginx</a>
+                        <a href="{% url 'tag' 'ubuntu' %}" class="text-decoration-none fs-6 text-danger">ubuntu</a>
+                        <a href="{% url 'tag' 'postgresql' %}"
+                            class="text-decoration-none fs-4 text-success">postgresql</a>
+                        <a href="{% url 'tag' 'bash' %}" class="text-decoration-none fs-5 text-dark">bash</a>
                     </div>
                 </div>
                 <h4>Best Members</h4>
@@ -115,3 +125,4 @@
 </body>
 
 </html>
+F
