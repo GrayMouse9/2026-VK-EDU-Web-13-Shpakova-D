@@ -2,13 +2,11 @@
 {% load static %}
 
 {% block content %}
-<h2>New Questions</h2>
+<h2>Hot Questions</h2>
 <hr>
 
 {% for question in page.object_list %}
-
     {% include 'inc/question.html' with question=question %}
-
 {% endfor %}
 
 {% include 'inc/pagination.html' %}
