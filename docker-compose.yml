@@ -1,6 +1,22 @@
-version: '3.8'
-
 services:
+  db:
+    image: postgres:17
+    env_file:
+      - .env.docker
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
     ports:
@@ -9,7 +25,13 @@ services:
       - .:/app
       - media_data:/app/media
     env_file:
-      - .env
+      - .env.docker
+    environment:
+      DJANGO_ENV_FILE: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   media_data:
+  pg_data:
