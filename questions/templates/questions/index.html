@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -6,11 +7,18 @@
 <hr>
 
 {% for question in page.object_list %}
-
     {% include 'inc/question.html' with question=question %}
-
+{% empty %}
+    <div class="text-center py-5">
+        <img src="{% static 'img/avatar.png' %}" width="80" height="80" class="rounded-circle mb-3 opacity-50" alt="Empty">
+        <h5 class="text-muted mb-2">Пока нет ни одного вопроса</h5>
+        <p class="text-muted mb-3">Будь первым — задай свой вопрос, и сообщество поможет!</p>
+        <a href="{% url 'ask' %}" class="btn btn-primary">Задать вопрос</a>
+    </div>
 {% endfor %}
 
-{% include 'inc/pagination.html' %}
+{% if page.object_list %}
+    {% include 'inc/pagination.html' %}
+{% endif %}
 
 {% endblock %}

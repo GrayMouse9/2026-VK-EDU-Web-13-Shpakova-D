@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -10,8 +11,16 @@
 
 {% for question in page.object_list %}
     {% include 'inc/question.html' with question=question %}
+{% empty %}
+    <div class="text-center py-5">
+        <h5 class="text-muted mb-2">По тегу <strong>{{ tag }}</strong> пока нет вопросов</h5>
+        <p class="text-muted mb-3">Задай первый вопрос с этим тегом — может быть кто-то поможет!</p>
+        <a href="{% url 'ask' %}" class="btn btn-primary">Задать вопрос</a>
+    </div>
 {% endfor %}
 
-{% include 'inc/pagination.html' %}
+{% if page.object_list %}
+    {% include 'inc/pagination.html' %}
+{% endif %}
 
 {% endblock %}

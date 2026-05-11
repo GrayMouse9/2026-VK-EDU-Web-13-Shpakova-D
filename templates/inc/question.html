@@ -24,12 +24,12 @@
                     <div>
                         <a href="{% url 'question' question_id=question.id %}" class="text-decoration-none me-3">Answer: {{ question.answers_count }}</a>
                         <span class="text-muted me-1">Tags:</span>
-                        {% for tag in question.tags %}
-                            <a href="{% url 'tag' tag %}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
+                        {% for tag in question.tags.all %}
+                            <a href="{% url 'tag' tag.name %}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
                         {% endfor %}
                     </div>
                     <div class="text-muted small">
-                        {{ question.author }} | 2 часа назад
+                        {{ question.author }} | {{ question.created_at|date:"d.m.Y H:i" }}
                     </div>
                 </div>
             </div>
