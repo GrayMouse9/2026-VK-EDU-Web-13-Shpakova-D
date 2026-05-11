@@ -41,7 +41,7 @@ def question(request, question_id):
         pk=question_id,
     )
     answers = item.answers.all().select_related('author')
-    page = paginate(answers, request, per_page=5)
+    page = paginate(answers, request, per_page=30)
     return render(request, 'questions/question.html', {'question': item, 'page': page})
 
 
