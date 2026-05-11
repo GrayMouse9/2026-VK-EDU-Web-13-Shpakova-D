@@ -4,47 +4,53 @@
 {% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-md-8 col-lg-6">
-
         {% if request.user.is_authenticated %}
-            <div class="alert alert-success text-center shadow-sm" role="alert">
-                You are already logged in.
+            <div class="alert alert-success text-center shadow-sm">
+                Вы уже вошли как <strong>{{ request.user.username }}</strong>.
                 <br><br>
-                <a href="#" class="btn btn-outline-danger">Log out</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">Выйти</a>
             </div>
         {% else %}
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <h3 class="card-title text-center mb-4">Log In</h3>
+                    <h3 class="card-title text-center mb-4">Вход</h3>
 
                     <form method="POST" action="{% url 'login' %}">
                         {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}">
 
-                        <div class="mb-3">
-                            <label for="loginInput" class="form-label fw-bold">Login</label>
-                            <input type="text" class="form-control" id="loginInput" placeholder="Enter your login">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="passwordInput" class="form-label fw-bold">Password</label>
-                            <input type="password" class="form-control is-invalid" id="passwordInput"
-                                placeholder="Enter your password">
-                            <div class="invalid-feedback">
-                                Sorry, wrong password! Please try again.
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
                             </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">{{ form.username.label }}</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mb-3">Log in!</button>
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-bold">{{ form.password.label }}</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Войти</button>
 
                         <div class="text-center">
-                            <span class="text-muted">New user?</span>
-                            <a href="{% url 'signup' %}" class="text-decoration-none fw-bold">Create new account</a>
+                            <span class="text-muted">Нет аккаунта?</span>
+                            <a href="{% url 'signup' %}" class="text-decoration-none fw-bold">Зарегистрироваться</a>
                         </div>
                     </form>
-
                 </div>
             </div>
         {% endif %}
-
     </div>
 </div>
 {% endblock %}

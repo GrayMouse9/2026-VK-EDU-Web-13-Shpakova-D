@@ -1,24 +1,30 @@
+from django.core.cache import cache
 from django.contrib.auth.models import User
 from django.db.models import Count
 from questions.models import Tag
 
-
 def sidebar_data(request):
-    """Подгружает данные для общего сайдбара: популярные теги и активные пользователи."""
+    popular_tags = cache.get('popular_tags_cache')
 
-    popular_tags = (
-        Tag.objects
-        .annotate(questions_count=Count('questions', distinct=True))
-        .order_by('-questions_count')[:20]
-    )
-
-    best_users = (
-        User.objects
-        .annotate(
-            activity=Count('questions', distinct=True) + Count('answers', distinct=True)
+    if not popular_tags:
+        popular_tags = list(
+            Tag.objects
+            .annotate(questions_count=Count('questions', distinct=True))
+            .order_by('-questions_count')[:20]
         )
-        .order_by('-activity')[:10]
-    )
+        cache.set('popular_tags_cache', popular_tags, 900)
+
+    best_users = cache.get('best_users_cache')
+
+    if not best_users:
+        best_users = list(
+            User.objects
+            .annotate(
+                activity=Count('questions', distinct=True) + Count('answers', distinct=True)
+            )
+            .order_by('-activity')[:10]
+        )
+        cache.set('best_users_cache', best_users, 900)
 
     return {
         'popular_tags': popular_tags,

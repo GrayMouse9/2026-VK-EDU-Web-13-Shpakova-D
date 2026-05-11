@@ -1,7 +1,14 @@
-
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.urls import reverse_lazy
+
 from .models import Question, Tag
+from .forms import AskForm, AnswerForm
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import QuestionLike, AnswerLike, Answer
 
 
 def paginate(objects_list, request, per_page=20):
@@ -40,10 +47,97 @@ def question(request, question_id):
         Question.objects.select_related('author').prefetch_related('tags'),
         pk=question_id,
     )
+
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect(f"{reverse_lazy('login')}?next={request.path}")
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(author=request.user, question=item)
+            return redirect(f"{request.path}#answer-{answer.id}")
+    else:
+        form = AnswerForm()
+
     answers = item.answers.all().select_related('author')
     page = paginate(answers, request, per_page=30)
-    return render(request, 'questions/question.html', {'question': item, 'page': page})
+    return render(request, 'questions/question.html', {
+        'question': item,
+        'page': page,
+        'form': form,
+    })
 
 
+@login_required(login_url=reverse_lazy('login'))
 def ask(request):
-    return render(request, 'questions/ask.html')
+    if request.method == 'POST':
+        form = AskForm(request.POST)
+        if form.is_valid():
+            question = form.save(author=request.user)
+            return redirect('question', question_id=question.id)
+    else:
+        form = AskForm()
+    return render(request, 'questions/ask.html', {'form': form})
+
+@require_POST
+def vote_question(request, question_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Login required'}, status=401)
+
+    action = request.POST.get('action')
+    value = 1 if action == 'up' else -1
+    question = get_object_or_404(Question, pk=question_id)
+
+    like, created = QuestionLike.objects.get_or_create(
+        user=request.user, question=question, defaults={'value': value}
+    )
+
+    user_vote = 0
+
+    if not created:
+        if like.value == value:
+            like.delete()
+            question.rating -= value
+            user_vote = 0
+        else:
+            question.rating += (value * 2)
+            like.value = value
+            like.save()
+            user_vote = value
+    else:
+        question.rating += value
+        user_vote = value
+
+    question.save()
+    return JsonResponse({'rating': question.rating, 'user_vote': user_vote})
+
+@require_POST
+def vote_answer(request, answer_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Login required'}, status=401)
+
+    action = request.POST.get('action')
+    value = 1 if action == 'up' else -1
+    answer = get_object_or_404(Answer, pk=answer_id)
+
+    like, created = AnswerLike.objects.get_or_create(
+        user=request.user, answer=answer, defaults={'value': value}
+    )
+
+    user_vote = 0
+
+    if not created:
+        if like.value == value:
+            like.delete()
+            answer.rating -= value
+            user_vote = 0
+        else:
+            answer.rating += (value * 2)
+            like.value = value
+            like.save()
+            user_vote = value
+    else:
+        answer.rating += value
+        user_vote = value
+
+    answer.save()
+    return JsonResponse({'rating': answer.rating, 'user_vote': user_vote})
