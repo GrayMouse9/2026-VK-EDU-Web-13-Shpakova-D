@@ -10,16 +10,20 @@ class AskForm(forms.ModelForm):
         help_text='Введите до 3 тегов через запятую.',
     )
 
+    text = forms.CharField(
+        label='Текст',
+        max_length=10000,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5})
+    )
+
     class Meta:
         model = Question
         fields = ('title', 'text')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Заголовок вопроса'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
         }
         labels = {
             'title': 'Заголовок',
-            'text': 'Текст',
         }
 
     def clean_tags(self):
@@ -43,16 +47,15 @@ class AskForm(forms.ModelForm):
 
 
 class AnswerForm(forms.ModelForm):
+    text = forms.CharField(
+        label='Текст ответа',
+        max_length=10000,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Напишите ваш ответ...'})
+    )
+
     class Meta:
         model = Answer
         fields = ('text',)
-        widgets = {
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Напишите ваш ответ...'}),
-        }
-        labels = {
-            'text': 'Текст ответа',
-        }
-
     def save(self, commit=True, author=None, question=None):
         answer = super().save(commit=False)
         if author:

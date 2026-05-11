@@ -9,23 +9,14 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Определяем базовую директорию (корень проекта)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-_ENV_FILE = os.environ.get('DJANGO_ENV_FILE')
-if _ENV_FILE and os.path.exists(os.path.join(BASE_DIR, _ENV_FILE)):
-    load_dotenv(os.path.join(BASE_DIR, _ENV_FILE))
-elif os.path.exists(os.path.join(BASE_DIR, '.env.local')):
-    load_dotenv(os.path.join(BASE_DIR, '.env.local'))
-else:
-    load_dotenv(os.path.join(BASE_DIR, '.env'))
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -34,7 +25,7 @@ DEBUG = os.environ.get('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
-
+INTERNAL_IPS = os.getenv("INTERNAL_IPS", "127.0.0.1").split(",")
 
 # Application definition
 
@@ -59,10 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-INTERNAL_IPS = [
-    '127.0.0.1',
 ]
 
 ROOT_URLCONF = 'application.urls'

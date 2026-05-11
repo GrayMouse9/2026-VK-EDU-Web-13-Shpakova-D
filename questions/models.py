@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Count
 from django.contrib.auth.models import User
+from .managers import QuestionManager
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name='Название')
@@ -13,28 +14,11 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
 
-class QuestionManager(models.Manager):
-    def with_related(self):
-        return (
-            self.get_queryset()
-            .select_related('author')
-            .prefetch_related('tags')
-            .annotate(answers_count=Count('answers'))
-        )
-
-    def new(self):
-        return self.with_related().order_by('-created_at')
-
-    def hot(self):
-        return self.with_related().order_by('-rating')
-
-    def by_tag(self, tag_name):
-        return self.with_related().filter(tags__name=tag_name).order_by('-rating')
-
 class Question(models.Model):
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     text = models.TextField(verbose_name='Текст')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions', verbose_name='Автор')
+    # Убрали дубль null=True
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='questions', verbose_name='Автор')
     tags = models.ManyToManyField(Tag, blank=True, related_name='questions', verbose_name='Теги')
     rating = models.IntegerField(default=0, verbose_name='Рейтинг')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
@@ -51,14 +35,15 @@ class Question(models.Model):
 
 class Answer(models.Model):
     text = models.TextField(verbose_name='Текст')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answers', verbose_name='Автор')
+    # Поменяли CASCADE на SET_NULL
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='answers', verbose_name='Автор')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers', verbose_name='Вопрос')
     is_correct = models.BooleanField(default=False, verbose_name='Правильный ответ')
     rating = models.IntegerField(default=0, verbose_name='Рейтинг')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
 
     def __str__(self):
-        return f'Ответ на "{self.question.title}" от {self.author.username}'
+        return f'Ответ {self.id} на вопрос {self.question_id} от юзера {self.author_id}'
 
     class Meta:
         verbose_name = 'Ответ'
@@ -66,7 +51,8 @@ class Answer(models.Model):
 
 
 class QuestionLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_likes', verbose_name='Пользователь')
+    # Поменяли CASCADE на SET_NULL
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='question_likes', verbose_name='Пользователь')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='likes', verbose_name='Вопрос')
     value = models.SmallIntegerField(default=1, verbose_name='Значение')  # 1 или -1
 
@@ -77,7 +63,8 @@ class QuestionLike(models.Model):
 
 
 class AnswerLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answer_likes', verbose_name='Пользователь')
+    # Поменяли CASCADE на SET_NULL
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='answer_likes', verbose_name='Пользователь')
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, related_name='likes', verbose_name='Ответ')
     value = models.SmallIntegerField(default=1, verbose_name='Значение')  # 1 или -1
 
