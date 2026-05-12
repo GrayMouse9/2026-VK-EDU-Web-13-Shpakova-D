@@ -2,3 +2,11 @@
     max-width: 40px;
 }
 
+.answer-card {
+    min-height: 130px;
+}
+
+.answer-card > .row,
+.answer-card > .row > [class^="col-"] {
+    min-height: 130px;
+}

@@ -62,3 +62,46 @@ class AnswerForm(forms.ModelForm):
         if commit:
             answer.save()
         return answer
+
+class VoteForm(forms.Form):
+    ACTION_UP = 'up'
+    ACTION_DOWN = 'down'
+    ACTION_CHOICES = [(ACTION_UP, 'up'), (ACTION_DOWN, 'down')]
+
+    action = forms.ChoiceField(
+        choices=ACTION_CHOICES,
+        error_messages={
+            'required': 'Параметр "action" обязателен.',
+            'invalid_choice': 'Допустимые значения action: "up" или "down".',
+        },
+    )
+
+    @property
+    def value(self):
+        return 1 if self.cleaned_data['action'] == self.ACTION_UP else -1
+
+class MarkCorrectForm(forms.Form):
+    """Валидация входных данных AJAX-отметки правильного ответа."""
+
+    answer_id = forms.IntegerField(
+        min_value=1,
+        error_messages={
+            'required': 'Параметр answer_id обязателен.',
+            'invalid': 'answer_id должен быть числом.',
+            'min_value': 'answer_id должен быть положительным.',
+        },
+    )
+
+    def __init__(self, *args, question=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.question = question
+
+    def clean_answer_id(self):
+        answer_id = self.cleaned_data['answer_id']
+        if self.question is None:
+            raise forms.ValidationError('Вопрос не передан в форму.')
+        try:
+            self.answer = Answer.objects.get(pk=answer_id, question=self.question)
+        except Answer.DoesNotExist:
+            raise forms.ValidationError('Ответ не найден для этого вопроса.')
+        return answer_id

@@ -1,0 +1,16 @@
+{% comment %}
+Параметры: profile_user (User), size (px, по умолчанию 40), css_classes (string)
+Использование:
+  {% include 'inc/avatar.html' with profile_user=answer.author size=45 %}
+{% endcomment %}
+{% load static %}
+{% with avatar=profile_user.profile.avatar %}
+    <img
+        src="{% if avatar %}{{ MEDIA_URL }}{{ avatar }}{% else %}{{ DEFAULT_AVATAR_URL }}{% endif %}"
+        width="{{ size|default:40 }}"
+        height="{{ size|default:40 }}"
+        class="rounded-circle {{ css_classes }}"
+        alt="Avatar"
+        style="object-fit: cover;"
+    >
+{% endwith %}

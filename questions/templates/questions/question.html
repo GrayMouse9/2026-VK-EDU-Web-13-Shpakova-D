@@ -5,21 +5,27 @@
 <div class="card mb-3 shadow-sm border-bottom">
     <div class="row g-0">
         <div class="col-12 col-md-2 col-3 d-flex flex-column align-items-center py-3 px-2">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-
+            {% include 'inc/avatar.html' with profile_user=question.author size=55 css_classes='mb-2' %}
             <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
                 {% if user.is_authenticated %}
-                    <button class="btn btn-outline-success px-2 js-vote" data-type="question" data-id="{{ question.id }}" data-action="up" type="button">+</button>
+                <button class="btn btn-outline-success px-2 js-vote" data-type="question" data-id="{{ question.id }}"
+                    data-action="up" type="button">+</button>
                 {% else %}
-                    <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">+</button>
+                <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip"
+                    title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;"
+                    onclick="return false;">+</button>
                 {% endif %}
 
-                <input type="text" class="form-control text-center px-0 rating-input" value="{{ question.rating }}" readonly>
+                <input type="text" class="form-control text-center px-0 rating-input" value="{{ question.rating }}"
+                    readonly>
 
                 {% if user.is_authenticated %}
-                    <button class="btn btn-outline-danger px-2 js-vote" data-type="question" data-id="{{ question.id }}" data-action="down" type="button">-</button>
+                <button class="btn btn-outline-danger px-2 js-vote" data-type="question" data-id="{{ question.id }}"
+                    data-action="down" type="button">-</button>
                 {% else %}
-                    <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">-</button>
+                <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip"
+                    title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;"
+                    onclick="return false;">-</button>
                 {% endif %}
             </div>
         </div>
@@ -31,7 +37,8 @@
                     <div>
                         <span class="me-3 text-muted">Answers: {{ page.paginator.count }}</span>
                         {% for tag in question.tags.all %}
-                            <a href="{% url 'tag' tag.name %}" class="badge bg-light text-primary text-decoration-none border me-1">{{ tag.name }}</a>
+                        <a href="{% url 'tag' tag.name %}"
+                            class="badge bg-light text-primary text-decoration-none border me-1">{{ tag.name }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -43,39 +50,56 @@
 <hr class="my-4">
 
 {% for answer in page.object_list %}
-<div class="card mb-3 border-0 border-bottom pb-2">
+<div class="card mb-3 border-0 border-bottom pb-2 answer-card {% if answer.is_correct %}bg-success bg-opacity-10{% endif %}" id="answer-{{ answer.id }}">
     <div class="row g-0">
         <div class="col-2 text-center py-2">
-            <img src="{% static 'img/avatar.png' %}" width="45" height="45" class="rounded-circle mb-2">
-
+            {% include 'inc/avatar.html' with profile_user=answer.author size=45 css_classes='mb-2' %}
             <div class="input-group input-group-sm mb-2 justify-content-center">
                 {% if user.is_authenticated %}
-                    <button class="btn btn-outline-success px-2 js-vote" data-type="answer" data-id="{{ answer.id }}" data-action="up" type="button">+</button>
+                <button class="btn btn-outline-success px-2 js-vote" data-type="answer" data-id="{{ answer.id }}"
+                    data-action="up" type="button">+</button>
                 {% else %}
-                    <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">+</button>
+                <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip"
+                    title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;"
+                    onclick="return false;">+</button>
                 {% endif %}
 
                 <input type="text" class="form-control text-center rating-input" value="{{ answer.rating }}" readonly>
 
                 {% if user.is_authenticated %}
-                    <button class="btn btn-outline-danger px-2 js-vote" data-type="answer" data-id="{{ answer.id }}" data-action="down" type="button">-</button>
+                <button class="btn btn-outline-danger px-2 js-vote" data-type="answer" data-id="{{ answer.id }}"
+                    data-action="down" type="button">-</button>
                 {% else %}
-                    <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">-</button>
+                <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip"
+                    title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;"
+                    onclick="return false;">-</button>
                 {% endif %}
             </div>
+            {% if user.is_authenticated and user == question.author %}
+            <button
+                class="btn btn-sm js-mark-correct mt-1 {% if answer.is_correct %}btn-success{% else %}btn-outline-success{% endif %}"
+                data-question-id="{{ question.id }}" data-answer-id="{{ answer.id }}" type="button"
+                title="{% if answer.is_correct %}Снять метку правильного ответа{% else %}Отметить как правильный ответ{% endif %}">
+                ✓
+            </button>
+            {% elif answer.is_correct %}
+            <div class="text-success fs-3 lh-1 mt-1" title="Правильный ответ" aria-label="Правильный ответ">✓</div>
+            {% endif %}
         </div>
-        <div class="col-10">
-            <div class="card-body py-1">
-                <p class="card-text mb-2">{{ answer.text }}</p>
-                <div class="text-end text-muted small">{{ answer.author.username }} | {{ answer.created_at|date:"d.m.Y" }}</div>
+            <div class="col-10">
+            <div class="card-body py-2 d-flex flex-column h-100">
+                <p class="card-text mb-2 flex-grow-1">{{ answer.text }}</p>
+                <div class="text-end text-muted small mt-auto">
+                    {{ answer.author.username }} | {{ answer.created_at|date:"d.m.Y" }}
             </div>
         </div>
+</div>
     </div>
 </div>
 {% endfor %}
 
 {% if page.has_other_pages %}
-    {% include 'inc/pagination.html' %}
+{% include 'inc/pagination.html' %}
 {% endif %}
 
 <hr class="my-4">
@@ -85,7 +109,8 @@
 <form method="POST" action="{% url 'question' question.id %}">
     {% csrf_token %}
     <div class="mb-3">
-        <textarea name="text" class="form-control {% if form.text.errors %}is-invalid{% endif %}" rows="5" placeholder="Enter your answer here...">{{ form.text.value|default_if_none:'' }}</textarea>
+        <textarea name="text" class="form-control {% if form.text.errors %}is-invalid{% endif %}" rows="5"
+            placeholder="Enter your answer here...">{{ form.text.value|default_if_none:'' }}</textarea>
         {% if form.text.errors %}<div class="invalid-feedback">{{ form.text.errors|striptags }}</div>{% endif %}
     </div>
     <button type="submit" class="btn btn-primary">Reply</button>

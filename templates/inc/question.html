@@ -3,7 +3,7 @@
 <div class="card mb-3 shadow-sm">
     <div class="row g-0">
         <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
+           {% include 'inc/avatar.html' with profile_user=question.author size=55 css_classes='mb-2' %}
             <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
 
                 {% if user.is_authenticated %}

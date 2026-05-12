@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.contrib.auth.models import User
 from django.db.models import Count
 from questions.models import Tag
+from django.conf import settings
 
 def sidebar_data(request):
     popular_tags = cache.get('popular_tags_cache')
@@ -29,4 +30,11 @@ def sidebar_data(request):
     return {
         'popular_tags': popular_tags,
         'best_users': best_users,
+    }
+
+def media_settings(request):
+    """Прокидываем MEDIA_URL и дефолтную аватарку в каждый шаблон."""
+    return {
+        'MEDIA_URL': settings.MEDIA_URL,
+        'DEFAULT_AVATAR_URL': settings.DEFAULT_AVATAR_URL,
     }

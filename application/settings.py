@@ -78,6 +78,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.sidebar_data',
+                'core.context_processors.media_settings',
             ],
         },
     },
@@ -143,3 +144,14 @@ CACHES = {
         'LOCATION': 'askpupkin-cache',
     }
 }
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Default avatar (используется в шаблонах через context_processor)
+DEFAULT_AVATAR_URL = STATIC_URL + 'img/avatar.png'
+
+# Максимальный размер загружаемого файла (5 МБ) — мягкая защита на уровне Django
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

@@ -1,10 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.db import transaction
 
 from .models import Question, Tag
-from .forms import AskForm, AnswerForm
+from .forms import AskForm, AnswerForm, VoteForm, MarkCorrectForm
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -78,66 +79,121 @@ def ask(request):
         form = AskForm()
     return render(request, 'questions/ask.html', {'form': form})
 
+def _vote_invalid(form):
+    return JsonResponse(
+        {'error': 'Невалидные параметры запроса.', 'details': form.errors},
+        status=400,
+    )
+
+
+def _vote_unauth():
+    return JsonResponse(
+        {'error': 'Требуется авторизация.', 'login_url': reverse('login')},
+        status=401,
+    )
+
+
 @require_POST
 def vote_question(request, question_id):
     if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Login required'}, status=401)
+        return _vote_unauth()
 
-    action = request.POST.get('action')
-    value = 1 if action == 'up' else -1
-    question = get_object_or_404(Question, pk=question_id)
+    form = VoteForm(request.POST)
+    if not form.is_valid():
+        return _vote_invalid(form)
 
-    like, created = QuestionLike.objects.get_or_create(
-        user=request.user, question=question, defaults={'value': value}
-    )
+    value = form.value
 
-    user_vote = 0
-
-    if not created:
-        if like.value == value:
-            like.delete()
-            question.rating -= value
-            user_vote = 0
+    with transaction.atomic():
+        question = get_object_or_404(
+            Question.objects.select_for_update(), pk=question_id
+        )
+        like, created = QuestionLike.objects.get_or_create(
+            user=request.user, question=question, defaults={'value': value}
+        )
+        if not created:
+            if like.value == value:
+                like.delete()
+                question.rating -= value
+                user_vote = 0
+            else:
+                question.rating += value * 2
+                like.value = value
+                like.save()
+                user_vote = value
         else:
-            question.rating += (value * 2)
-            like.value = value
-            like.save()
+            question.rating += value
             user_vote = value
-    else:
-        question.rating += value
-        user_vote = value
+        question.save()
 
-    question.save()
     return JsonResponse({'rating': question.rating, 'user_vote': user_vote})
+
 
 @require_POST
 def vote_answer(request, answer_id):
     if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Login required'}, status=401)
+        return _vote_unauth()
 
-    action = request.POST.get('action')
-    value = 1 if action == 'up' else -1
-    answer = get_object_or_404(Answer, pk=answer_id)
+    form = VoteForm(request.POST)
+    if not form.is_valid():
+        return _vote_invalid(form)
 
-    like, created = AnswerLike.objects.get_or_create(
-        user=request.user, answer=answer, defaults={'value': value}
-    )
+    value = form.value
 
-    user_vote = 0
-
-    if not created:
-        if like.value == value:
-            like.delete()
-            answer.rating -= value
-            user_vote = 0
+    with transaction.atomic():
+        answer = get_object_or_404(
+            Answer.objects.select_for_update(), pk=answer_id
+        )
+        like, created = AnswerLike.objects.get_or_create(
+            user=request.user, answer=answer, defaults={'value': value}
+        )
+        if not created:
+            if like.value == value:
+                like.delete()
+                answer.rating -= value
+                user_vote = 0
+            else:
+                answer.rating += value * 2
+                like.value = value
+                like.save()
+                user_vote = value
         else:
-            answer.rating += (value * 2)
-            like.value = value
-            like.save()
+            answer.rating += value
             user_vote = value
-    else:
-        answer.rating += value
-        user_vote = value
+        answer.save()
 
-    answer.save()
     return JsonResponse({'rating': answer.rating, 'user_vote': user_vote})
+
+@require_POST
+def mark_correct(request, question_id):
+    if not request.user.is_authenticated:
+        return _vote_unauth()
+
+    question = get_object_or_404(Question, pk=question_id)
+
+    if question.author_id != request.user.id:
+        return JsonResponse(
+            {'error': 'Только автор вопроса может отмечать правильный ответ.'},
+            status=403,
+        )
+
+    form = MarkCorrectForm(request.POST, question=question)
+    if not form.is_valid():
+        return _vote_invalid(form)
+
+    answer = form.answer
+
+    with transaction.atomic():
+        answer = Answer.objects.select_for_update().get(pk=answer.pk)
+        was_correct = answer.is_correct
+
+        Answer.objects.filter(question=question).exclude(pk=answer.pk).update(is_correct=False)
+
+        answer.is_correct = not was_correct
+        answer.save(update_fields=['is_correct'])
+
+    return JsonResponse({
+        'answer_id': answer.id,
+        'question_id': question.id,
+        'is_correct': answer.is_correct,
+    })

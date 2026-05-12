@@ -37,8 +37,7 @@
 
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <img src="{% static 'img/avatar.png' %}" width="40" height="40" class="rounded-circle"
-                            alt="Avatar">
+                        {% include 'inc/avatar.html' with profile_user=user size=40 %}
                     </li>
                     <li class="nav-item d-flex flex-column lh-1">
                         <span class="fw-bold small mb-1">{{ user.username }}</span>

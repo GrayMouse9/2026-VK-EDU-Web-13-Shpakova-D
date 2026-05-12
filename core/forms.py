@@ -66,6 +66,9 @@ class RegisterForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
+    ALLOWED_AVATAR_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+    MAX_AVATAR_SIZE = 5 * 1024 * 1024
+
     email = forms.EmailField(
         label='Email',
         widget=forms.EmailInput(attrs={'class': 'form-control'})
@@ -79,12 +82,15 @@ class ProfileForm(forms.ModelForm):
         required=False, # Делаем необязательным, вдруг юзер захочет стереть ник
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    
+
     class Meta:
         model = Profile
         fields = ('avatar',)
         widgets = {
-            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
+            'avatar': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
+            }),
         }
         labels = {
             'avatar': 'Аватар',
@@ -96,6 +102,27 @@ class ProfileForm(forms.ModelForm):
         if self.user:
             self.fields['username'].initial = self.user.username
             self.fields['email'].initial = self.user.email
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get('avatar')
+        if not avatar:
+            return avatar
+        if not hasattr(avatar, 'content_type'):
+            return avatar
+
+        ext = avatar.name.rsplit('.', 1)[-1].lower() if '.' in avatar.name else ''
+        if ext not in self.ALLOWED_AVATAR_EXTENSIONS:
+            allowed = ', '.join(sorted(self.ALLOWED_AVATAR_EXTENSIONS))
+            raise forms.ValidationError(
+                f'Недопустимое расширение файла. Разрешены: {allowed}.'
+            )
+
+        if avatar.size > self.MAX_AVATAR_SIZE:
+            raise forms.ValidationError(
+                f'Файл слишком большой. Максимум — '
+                f'{self.MAX_AVATAR_SIZE // (1024 * 1024)} МБ.'
+            )
+        return avatar
 
     def save(self, commit=True):
         profile = super().save(commit=False)
