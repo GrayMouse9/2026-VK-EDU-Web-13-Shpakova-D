@@ -40,13 +40,24 @@ AskPupkin — это платформа, где пользователи мог�
 
 ## Конфигурация окружения
 
-В корне проекта используются три `.env`-файла:
+В корне проекта используются два `.env`-файла (оба игнорируются git):
 
-- **`.env.example`** — шаблон со всеми переменными (без секретов), коммитится в репозиторий.
-- **`.env.local`** — для локального запуска Django (`DB_HOST=localhost`). Игнорируется git.
-- **`.env.docker`** — для запуска через docker-compose (`DB_HOST=db`). Игнорируется git.
+- **`.env.local`** — для локального запуска Django (`DB_HOST=localhost`, `DB_PORT=5433`).
+- **`.env.docker`** — для запуска через docker-compose (`DB_HOST=db`, `DB_PORT=5432`).
 
-При локальном запуске Django сначала ищет `.env.local`, потом `.env`. В docker-окружении используется `.env.docker` через `env_file` в `docker-compose.yml`.
+Создайте оба файла локально по структуре:
+
+```
+SECRET_KEY='your-secret-key'
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=ask_pupkin
+DB_USER=postgres
+DB_PASSWORD=admin
+DB_HOST=localhost   # для .env.local;  для .env.docker → db
+DB_PORT=5433        # для .env.local;  для .env.docker → 5432
+```
 
 ## Запуск проекта
 
@@ -64,7 +75,7 @@ cp .env.example .env.local
 cp .env.example .env.docker
 ```
 
-В `.env.local` оставь `DB_HOST=localhost`. В `.env.docker` поменяй на `DB_HOST=db`.
+В `.env.local` оставьте `DB_HOST=localhost`. В `.env.docker` поменяйте на `DB_HOST=db`.
 
 ### Вариант A. Локальный запуск (Django + Postgres в Docker)
 
@@ -102,7 +113,7 @@ docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py fill_db 5
 ```
 
-После любого из вариантов открой в браузере `http://127.0.0.1:8000/`.
+После любого из вариантов откройте в браузере `http://127.0.0.1:8000/`.
 
 ## Структура проекта
 

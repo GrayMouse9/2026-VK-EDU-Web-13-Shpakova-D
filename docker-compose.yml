@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:17
     env_file:
-      - .env
+      - .env.docker
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -25,7 +25,7 @@ services:
       - .:/app
       - media_data:/app/media
     env_file:
-      - .env
+      - .env.docker
     environment:
       DJANGO_ENV_FILE: .env.docker
     depends_on:
