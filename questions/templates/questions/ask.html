@@ -5,33 +5,42 @@
 <h2 class="mb-4">New Question</h2>
 
 <form method="POST" action="{% url 'ask' %}">
-
     {% csrf_token %}
 
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
     <div class="mb-3">
-        <label for="titleInput" class="form-label fw-bold">Title</label>
-        <input type="text" class="form-control is-invalid" id="titleInput" name="title" placeholder="How to build a web app?">
-        <div class="invalid-feedback">
-            The title is too short. Please describe the problem in more detail.
-        </div>
-        <div class="form-text">Formulate the question so that the essence is clear before reading the details.
-        </div>
+        <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">{{ form.title.label }}</label>
+        {{ form.title }}
+
+        {% if form.title.errors %}
+            <div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>
+        {% endif %}
+        <div class="form-text">Formulate the question so that the essence is clear.</div>
     </div>
 
     <div class="mb-3">
-        <label for="textInput" class="form-label fw-bold">Text</label>
-        <textarea class="form-control" id="textInput" name="text" rows="10"
-            placeholder="Describe your problem in detail..."></textarea>
-        <div class="form-text">Please try to provide as detailed a description as possible, and include snippets of code or error logs.</div>
+        <label for="{{ form.text.id_for_label }}" class="form-label fw-bold">{{ form.text.label }}</label>
+        {{ form.text }}
+
+        {% if form.text.errors %}
+            <div class="invalid-feedback d-block">{{ form.text.errors|striptags }}</div>
+        {% endif %}
     </div>
 
     <div class="mb-4">
-        <label for="tagsInput" class="form-label fw-bold">Tags</label>
-        <input type="text" class="form-control" id="tagsInput" name="tags" placeholder="python, django, bootstrap">
-        <div class="form-text">Enter up to 3 tags, separated by spaces or commas.</div>
+        <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">{{ form.tags.label }}</label>
+        {{ form.tags }}
+
+        {% if form.tags.errors %}
+            <div class="invalid-feedback d-block">{{ form.tags.errors|striptags }}</div>
+        {% endif %}
+        <div class="form-text">Enter up to 3 tags, separated by commas.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Ask!</button>
-
+    <button type="submit" class="btn btn-primary px-4">Ask!</button>
 </form>
 {% endblock %}
+ 

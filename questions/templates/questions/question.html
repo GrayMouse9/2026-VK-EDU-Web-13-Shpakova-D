@@ -4,87 +4,95 @@
 {% block content %}
 <div class="card mb-3 shadow-sm border-bottom">
     <div class="row g-0">
-
-        <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
+        <div class="col-12 col-md-2 col-3 d-flex flex-column align-items-center py-3 px-2">
             <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
 
             <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
-                <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="5" readonly>
-                <button class="btn btn-outline-danger px-2" type="button">-</button>
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-success px-2 js-vote" data-type="question" data-id="{{ question.id }}" data-action="up" type="button">+</button>
+                {% else %}
+                    <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">+</button>
+                {% endif %}
+
+                <input type="text" class="form-control text-center px-0 rating-input" value="{{ question.rating }}" readonly>
+
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-danger px-2 js-vote" data-type="question" data-id="{{ question.id }}" data-action="down" type="button">-</button>
+                {% else %}
+                    <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">-</button>
+                {% endif %}
             </div>
-
         </div>
-
         <div class="col-md-10 col-12">
             <div class="card-body">
-                <h5 class="card-title">Как правильно отцентровать div?</h5>
-                <p class="card-text">
-                    Уже третий день пытаюсь выровнять блок по центру экрана. Пробовал использовать
-                    margin: 0 auto, но по вертикали он не выравнивается. Помогите разобраться с Flexbox!
-                </p>
-
+                <h5 class="card-title">{{ question.title }}</h5>
+                <p class="card-text">{{ question.text }}</p>
                 <div class="d-flex justify-content-between align-items-end mt-3">
                     <div>
-                        <a href="{% url 'question' question_id=1 %}" class="text-decoration-none me-3">Answer: 2</a>
-                        <span class="text-muted me-1">Tags:</span>
-                        {% for tag in question.tags %}
-                            <a href="{% url 'tag' tag %}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
+                        <span class="me-3 text-muted">Answers: {{ page.paginator.count }}</span>
+                        {% for tag in question.tags.all %}
+                            <a href="{% url 'tag' tag.name %}" class="badge bg-light text-primary text-decoration-none border me-1">{{ tag.name }}</a>
                         {% endfor %}
-                    </div>
-                    <div class="text-muted small">
-                        Dr. Pepper | 2 hours ago
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
+<hr class="my-4">
 
 {% for answer in page.object_list %}
-<div class="card mb-3 shadow-sm">
+<div class="card mb-3 border-0 border-bottom pb-2">
     <div class="row g-0">
-        <div class="col-12 col-md-2 col-3 d-flex flex-row flex-column align-items-center py-3 px-2 pb-0">
-            <img src="{% static 'img/avatar.png' %}" width="55" height="55" class="rounded-circle mb-2" alt="Avatar">
-            <div class="input-group input-group-sm mb-2 flex-nowrap justify-content-center">
-                <button class="btn btn-outline-success px-2" type="button">+</button>
-                <input type="text" class="form-control text-center px-0 rating-input" value="{{ answer.rating }}" readonly>
-                <button class="btn btn-outline-danger px-2" type="button">-</button>
-            </div>
+        <div class="col-2 text-center py-2">
+            <img src="{% static 'img/avatar.png' %}" width="45" height="45" class="rounded-circle mb-2">
 
-            <div class="form-check mt-auto mb-2">
-                <input class="form-check-input" type="checkbox" id="tAnswer{{ answer.id }}" {% if answer.is_correct %}checked{% endif %}>
-                <label class="form-check-label fw-bold small" for="tAnswer{{ answer.id }}">
-                    Correct!
-                </label>
+            <div class="input-group input-group-sm mb-2 justify-content-center">
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-success px-2 js-vote" data-type="answer" data-id="{{ answer.id }}" data-action="up" type="button">+</button>
+                {% else %}
+                    <button class="btn btn-outline-success px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">+</button>
+                {% endif %}
+
+                <input type="text" class="form-control text-center rating-input" value="{{ answer.rating }}" readonly>
+
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-danger px-2 js-vote" data-type="answer" data-id="{{ answer.id }}" data-action="down" type="button">-</button>
+                {% else %}
+                    <button class="btn btn-outline-danger px-2 opacity-50" data-bs-toggle="tooltip" title="Войдите, чтобы голосовать" type="button" style="cursor: not-allowed;" onclick="return false;">-</button>
+                {% endif %}
             </div>
         </div>
-        <div class="col-md-10 col-12">
-            <div class="card-body d-flex flex-column h-100">
-                <p class="card-text flex-grow-1">{{ answer.text }}</p>
-                <div class="mt-auto text-end text-muted small">
-                    {{ answer.author }} | 1 hour ago
-                </div>
+        <div class="col-10">
+            <div class="card-body py-1">
+                <p class="card-text mb-2">{{ answer.text }}</p>
+                <div class="text-end text-muted small">{{ answer.author.username }} | {{ answer.created_at|date:"d.m.Y" }}</div>
             </div>
         </div>
     </div>
 </div>
 {% endfor %}
 
-{% include 'inc/pagination.html' %}
+{% if page.has_other_pages %}
+    {% include 'inc/pagination.html' %}
+{% endif %}
 
 <hr class="my-4">
-<h5 class="mb-3">Your answer</h5>
 
-<form>
+{% if user.is_authenticated %}
+<h5 class="mb-3">Your answer</h5>
+<form method="POST" action="{% url 'question' question.id %}">
+    {% csrf_token %}
     <div class="mb-3">
-        <label for="answerInput" class="form-label">Reply text</label>
-        <textarea class="form-control" id="answerInput" rows="5" placeholder="Enter your answer here..."></textarea>
-        <div class="form-text">Please try to provide as detailed an answer as possible, using code examples if
-            necessary.</div>
+        <textarea name="text" class="form-control {% if form.text.errors %}is-invalid{% endif %}" rows="5" placeholder="Enter your answer here...">{{ form.text.value|default_if_none:'' }}</textarea>
+        {% if form.text.errors %}<div class="invalid-feedback">{{ form.text.errors|striptags }}</div>{% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">Answer</button>
+    <button type="submit" class="btn btn-primary">Reply</button>
 </form>
+{% else %}
+<div class="alert alert-light border text-center">
+    Please <a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to answer.
+</div>
+{% endif %}
 {% endblock %}
