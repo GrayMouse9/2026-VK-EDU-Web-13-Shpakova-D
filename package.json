@@ -1,0 +1,10 @@
+{
+  "name": "askpupkin",
+  "private": true,
+  "scripts": {
+    "install-static": "cp node_modules/centrifuge/dist/centrifuge.umd.js static/js/"
+  },
+  "dependencies": {
+    "centrifuge": "^5.2.2"
+  }
+}

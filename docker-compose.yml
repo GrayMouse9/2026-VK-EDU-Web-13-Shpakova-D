@@ -1,6 +1,31 @@
-version: '3.8'
-
 services:
+  db:
+    image: postgres:17
+    env_file:
+      - .env.docker
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
   web:
     build: .
     ports:
@@ -9,7 +34,72 @@ services:
       - .:/app
       - media_data:/app/media
     env_file:
-      - .env
+      - .env.docker
+    environment:
+      DJANGO_ENV_FILE: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app_network
+
+  celery:
+    build: .
+    command: celery -A application worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env.docker
+    environment:
+      DJANGO_ENV_FILE: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app_network
+
+  celerybeat:
+    build: .
+    command: celery -A application beat -l info -S redbeat.RedBeatScheduler
+    volumes:
+      - .:/app
+    env_file:
+      - .env.docker
+    environment:
+      DJANGO_ENV_FILE: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - app_network
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+    networks:
+      - app_network
+
+  centrifugo:
+    image: centrifugo/centrifugo:v4
+    command: centrifugo -c /centrifugo/config.json --admin --admin_insecure
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./centrifugo:/centrifugo
+    networks:
+      - app_network
+
+networks:
+  app_network:
 
 volumes:
   media_data:
+  pg_data:

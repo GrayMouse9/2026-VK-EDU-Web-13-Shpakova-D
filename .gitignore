@@ -136,6 +136,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.docker
 .envrc
 .venv
 env/
@@ -208,5 +210,6 @@ __marimo__/
 
 media/
 static/
+node_modules/
 .idea/
 .DS_Store

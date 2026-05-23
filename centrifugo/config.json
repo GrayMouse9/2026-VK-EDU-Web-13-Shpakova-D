@@ -1,0 +1,18 @@
+{
+  "token_hmac_secret_key": "centrifugo-token-secret",
+  "api_key": "centrifugo-api-key",
+  "port": 8003,
+  "namespaces": [
+    {
+      "name": "questions",
+      "allow_subscribe_for_client": true
+    }
+  ],
+  "log_level": "info",
+  "allowed_origins": ["http://localhost:8000"],
+  "admin": true,
+  "admin_external": true,
+  "admin_password": "admin",
+  "admin_secret": "admin-secret",
+  "admin_insecure": true
+}

@@ -7,4 +7,9 @@ urlpatterns = [
     path('question/<int:question_id>/', views.question, name='question'),
     path('ask/', views.ask, name='ask'),
     path('tag/<str:tag_name>/', views.tag, name='tag'),
+    path('vote/question/<int:question_id>/', views.vote_question, name='vote_question'),
+    path('vote/answer/<int:answer_id>/', views.vote_answer, name='vote_answer'),
+    path('question/<int:question_id>/mark_correct/', views.mark_correct, name='mark_correct'),
+    path('centrifugo/token/', views.centrifugo_token, name='centrifugo_token'),
+    path('search/', views.search, name='search'),
 ]
