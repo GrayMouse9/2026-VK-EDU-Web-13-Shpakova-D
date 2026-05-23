@@ -1,3 +1,7 @@
+import time
+import jwt
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -6,6 +10,7 @@ from django.db import transaction
 
 from .models import Question, Tag
 from .forms import AskForm, AnswerForm, VoteForm, MarkCorrectForm
+from .tasks import publish_new_answer
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -55,6 +60,14 @@ def question(request, question_id):
         form = AnswerForm(request.POST)
         if form.is_valid():
             answer = form.save(author=request.user, question=item)
+            publish_new_answer(item.id, {
+                'id': answer.id,
+                'text': answer.text,
+                'author': answer.author.username,
+                'created_at': answer.created_at.strftime('%d.%m.%Y'),
+                'rating': answer.rating,
+                'is_correct': answer.is_correct,
+            })
             return redirect(f"{request.path}#answer-{answer.id}")
     else:
         form = AnswerForm()
@@ -65,6 +78,7 @@ def question(request, question_id):
         'question': item,
         'page': page,
         'form': form,
+        'centrifugo_ws_url': settings.CENTRIFUGO_WS_URL,
     })
 
 
@@ -78,6 +92,16 @@ def ask(request):
     else:
         form = AskForm()
     return render(request, 'questions/ask.html', {'form': form})
+
+@login_required(login_url=reverse_lazy('login'))
+def centrifugo_token(request):
+    payload = {
+        'sub': str(request.user.id),
+        'exp': int(time.time()) + 3600,
+    }
+    token = jwt.encode(payload, settings.CENTRIFUGO_TOKEN_SECRET, algorithm='HS256')
+    return JsonResponse({'token': token})
+
 
 def _vote_invalid(form):
     return JsonResponse(

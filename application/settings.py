@@ -155,3 +155,9 @@ DEFAULT_AVATAR_URL = STATIC_URL + 'img/avatar.png'
 # Максимальный размер загружаемого файла (5 МБ) — мягкая защита на уровне Django
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
+# Centrifugo
+CENTRIFUGO_API_URL = os.environ.get('CENTRIFUGO_API_URL', 'http://localhost:8001/api')
+CENTRIFUGO_API_KEY = os.environ.get('CENTRIFUGO_API_KEY', 'centrifugo-api-key')
+CENTRIFUGO_TOKEN_SECRET = os.environ.get('CENTRIFUGO_TOKEN_SECRET', 'centrifugo-token-secret')
+CENTRIFUGO_WS_URL = os.environ.get('CENTRIFUGO_WS_URL', 'ws://localhost:8001/connection/websocket')

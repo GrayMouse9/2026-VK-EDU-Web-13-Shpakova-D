@@ -1,4 +1,6 @@
 asgiref==3.11.1
+PyJWT==2.13.0
+cent==5.2.0
 Django==6.0.3
 django-debug-toolbar==6.3.0
 Faker==40.15.0
