@@ -1,8 +1,9 @@
 asgiref==3.11.1
 PyJWT==2.13.0
-cent==5.2.0
+cent==4.1.0
 Django==6.0.3
 django-debug-toolbar==6.3.0
+django-redis==5.4.0
 Faker==40.15.0
 pillow==12.2.0
 psycopg==3.3.4
@@ -10,3 +11,6 @@ psycopg-binary==3.3.4
 python-dotenv==1.2.2
 sqlparse==0.5.5
 typing_extensions==4.15.0
+celery==5.5.2
+celery-redbeat==2.3.3
+redis==5.2.1

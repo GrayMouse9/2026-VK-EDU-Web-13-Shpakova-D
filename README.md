@@ -13,6 +13,10 @@ AskPupkin — это платформа, где пользователи мог�
 - **Backend:** Python 3.12, Django 6
 - **База данных:** PostgreSQL 17
 - **Frontend:** HTML5, CSS3, Bootstrap 5
+- **Real-time:** Centrifugo 4, centrifuge-js 5
+- **Очереди:** Celery 5, Redis 7, Redbeat
+- **Кэш:** django-redis
+- **Поиск:** PostgreSQL full-text search
 - **Контейнеризация:** Docker, Docker Compose
 - **Отладка:** django-debug-toolbar
 
@@ -57,7 +61,18 @@ git clone https://github.com/GrayMouse9/2026-VK-EDU-Web-13-Shpakova-D.git
 cd 2026-VK-EDU-Web-13-Shpakova-D
 ```
 
-### 2. Подготовить переменные окружения
+### 2. Установить JS-зависимости
+
+Браузерный клиент Centrifugo (`centrifuge.umd.js`) не хранится в репозитории — его нужно получить через npm:
+
+```bash
+npm install
+npm run install-static
+```
+
+Команда `install-static` копирует файл из `node_modules/centrifuge/dist/` в `static/js/`.
+
+### 3. Подготовить переменные окружения
 
 ```bash
 cp .env.example .env.local

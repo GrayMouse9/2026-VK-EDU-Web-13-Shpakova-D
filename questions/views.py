@@ -10,8 +10,9 @@ from django.db import transaction
 
 from .models import Question, Tag
 from .forms import AskForm, AnswerForm, VoteForm, MarkCorrectForm
-from .tasks import publish_new_answer
+from .tasks import publish_new_answer, notify_new_answer
 
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .models import QuestionLike, AnswerLike, Answer
@@ -48,6 +49,25 @@ def tag(request, tag_name):
     return render(request, 'questions/tag.html', {'page': page, 'tag': tag_name})
 
 
+def search(request):
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)
+    vector = SearchVector('title', weight='A') + SearchVector('text', weight='B')
+    query = SearchQuery(q)
+    results = (
+        Question.objects
+        .annotate(rank=SearchRank(vector, query))
+        .filter(rank__gt=0)
+        .order_by('-rank')[:8]
+    )
+    data = [
+        {'id': item.id, 'title': item.title, 'url': reverse('question', args=[item.id])}
+        for item in results
+    ]
+    return JsonResponse(data, safe=False)
+
+
 def question(request, question_id):
     item = get_object_or_404(
         Question.objects.select_related('author').prefetch_related('tags'),
@@ -60,7 +80,7 @@ def question(request, question_id):
         form = AnswerForm(request.POST)
         if form.is_valid():
             answer = form.save(author=request.user, question=item)
-            publish_new_answer(item.id, {
+            publish_new_answer.delay(item.id, {
                 'id': answer.id,
                 'text': answer.text,
                 'author': answer.author.username,
@@ -68,6 +88,12 @@ def question(request, question_id):
                 'rating': answer.rating,
                 'is_correct': answer.is_correct,
             })
+            notify_new_answer.delay(
+                question_title=item.title,
+                answer_author=answer.author.username,
+                answer_url=request.build_absolute_uri(f"{request.path}#answer-{answer.id}"),
+                recipient_email=item.author.email,
+            )
             return redirect(f"{request.path}#answer-{answer.id}")
     else:
         form = AnswerForm()

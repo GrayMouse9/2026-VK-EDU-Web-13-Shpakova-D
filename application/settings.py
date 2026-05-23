@@ -138,11 +138,38 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
+# Redis
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+REDIS_CACHE_DB = os.environ.get('REDIS_CACHE_DB', '0')
+REDIS_BROKER_DB = os.environ.get('REDIS_BROKER_DB', '1')
+REDIS_BEAT_DB = os.environ.get('REDIS_BEAT_DB', '2')
+
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'askpupkin-cache',
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CACHE_DB}',
+        'OPTIONS': {'CLIENT_CLASS': 'django_redis.client.DefaultClient'},
+        'TIMEOUT': 60 * 10,
     }
+}
+
+# Celery
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BROKER_DB}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}'
+CELERY_BEAT_SCHEDULER = 'redbeat.RedBeatScheduler'
+CELERY_REDBEAT_REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_BEAT_DB}'
+
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'recalculate-popular-tags': {
+        'task': 'questions.tasks.recalculate_popular_tags',
+        'schedule': crontab(minute='*/10'),
+    },
+    'recalculate-best-members': {
+        'task': 'questions.tasks.recalculate_best_members',
+        'schedule': crontab(minute='*/10'),
+    },
 }
 
 # Media files (uploads)
@@ -156,8 +183,15 @@ DEFAULT_AVATAR_URL = STATIC_URL + 'img/avatar.png'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '1025'))
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@askpupkin.ru')
+
 # Centrifugo
-CENTRIFUGO_API_URL = os.environ.get('CENTRIFUGO_API_URL', 'http://localhost:8001/api')
+CENTRIFUGO_API_URL = os.environ.get('CENTRIFUGO_API_URL', 'http://localhost:8003/api')
 CENTRIFUGO_API_KEY = os.environ.get('CENTRIFUGO_API_KEY', 'centrifugo-api-key')
 CENTRIFUGO_TOKEN_SECRET = os.environ.get('CENTRIFUGO_TOKEN_SECRET', 'centrifugo-token-secret')
-CENTRIFUGO_WS_URL = os.environ.get('CENTRIFUGO_WS_URL', 'ws://localhost:8001/connection/websocket')
+CENTRIFUGO_WS_URL = os.environ.get('CENTRIFUGO_WS_URL', 'ws://localhost:8003/connection/websocket')

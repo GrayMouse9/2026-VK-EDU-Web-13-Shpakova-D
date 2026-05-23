@@ -11,4 +11,5 @@ urlpatterns = [
     path('vote/answer/<int:answer_id>/', views.vote_answer, name='vote_answer'),
     path('question/<int:question_id>/mark_correct/', views.mark_correct, name='mark_correct'),
     path('centrifugo/token/', views.centrifugo_token, name='centrifugo_token'),
+    path('search/', views.search, name='search'),
 ]

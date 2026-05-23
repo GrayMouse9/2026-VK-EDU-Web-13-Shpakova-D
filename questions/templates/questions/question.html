@@ -134,7 +134,7 @@
      data-question-id="{{ question.id }}"
      data-current-page="{{ page.number }}"
      hidden></div>
-<script src="https://unpkg.com/centrifuge@5.2.2/dist/centrifuge.umd.js"></script>
+<script src="{% static 'js/centrifuge.umd.js' %}"></script>
 <script>
 (function () {
     const el = document.getElementById('centrifugo-data');
